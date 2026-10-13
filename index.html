@@ -1,164 +1,212 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>حسابي V2 | المدير المالي</title>
-  <style>
-    * { box-sizing: border-box; }
-    body { margin: 0; font-family: Arial, sans-serif; background: #f3f6fa; color: #1e293b; }
-    header { background: #102b46; color: white; padding: 28px 20px; text-align: center; }
-   .container { width: 92%; max-width: 1000px; margin: 25px auto; }
-   .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
-   .card { background: white; padding: 22px; border-radius: 14px; box-shadow: 0 3px 12px #0000000d; border-top: 4px solid #2563eb; }
-   .amount { font-size: 25px; font-weight: bold; }
-   .income { border-color: #16a34a; }.expenses { border-color: #dc2626; }
-   .balance { border-color: #2563eb; }.debt-in { border-color: #7c3aed; }.debt-out { border-color: #ea580c; }
-   .section { margin-top: 25px; background: white; padding: 22px; border-radius: 14px; box-shadow: 0 3px 12px #0000000d; }
-   .form { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
-    input, select, textarea, button { width: 100%; padding: 13px; border-radius: 8px; font-size: 15px; }
-    input, select, textarea { border: 1px solid #cbd5e1; }
-    button { border: none; cursor: pointer; font-weight: bold; background: #2563eb; color: white; }
-   .delete { background: #dc2626; }.paid { background: #15803d; }.wa { background: #25D366; }
-   .tools { display:flex; gap:8px; flex-wrap:wrap; margin:12px 0; }
-   .tools button { width:auto; padding:10px 14px; font-size:14px; }
-   .tools input { width:auto; max-width:250px; }
-    table { width: 100%; border-collapse: collapse; min-width: 700px; }
-    th, td { padding: 13px 10px; border-bottom: 1px solid #e2e8f0; text-align: right; }
-    th { background: #f8fafc; }
-   .table-wrap { overflow-x: auto; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>حسابي V5</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#102b46">
+<meta name="description" content="حسابي - المدير المالي">
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Tahoma,Arial;background:#f1f5f9;color:#0f172a}
+header{background:#102b46;color:#fff;padding:16px}
+.login-box{max-width:400px;margin:70px auto;background:#fff;padding:28px;border-radius:16px;box-shadow:0 10px 30px #0001;text-align:center}
+.section{background:#fff;padding:18px;border-radius:14px;box-shadow:0 3px 12px #0001;margin-top:16px}
+input,select,button{width:100%;padding:13px;border-radius:10px;font-size:14px;margin-top:8px}
+input,select{border:1px solid #cbd5e1;background:#fff}
+button{border:none;background:#2563eb;color:#fff;font-weight:bold;cursor:pointer}
+button:active{opacity:.8}
+.small{font-size:12px;color:#64748b}
+.badge{padding:4px 10px;border-radius:20px;color:#fff;font-size:12px}
+.active{background:#16a34a}.expired{background:#dc2626}
+.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse}th,td{padding:10px;border-bottom:1px solid #eee;text-align:right;font-size:13px}
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "firebase/app": "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js",
+    "firebase/firestore": "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"
+  }
+}
+</script>
 </head>
 <body>
-<header><h1>حسابي V2</h1><p>المدير المالي لمشروعك - نسخة مطورة</p></header>
-<main class="container">
-  <section class="cards">
-    <div class="card income"><h3>إجمالي الإيرادات</h3><div class="amount" id="totalIncome">0</div></div>
-    <div class="card expenses"><h3>إجمالي المصروفات</h3><div class="amount" id="totalExpenses">0</div></div>
-    <div class="card balance"><h3>الرصيد المتبقي</h3><div class="amount" id="balance">0</div></div>
-  </section>
 
-  <section class="section">
-    <h2>إضافة عملية مالية</h2>
-    <form id="transactionForm"><div class="form">
-      <select id="type"><option value="income">إيراد</option><option value="expense">مصروف</option></select>
-      <input id="description" placeholder="وصف العملية" required>
-      <input id="amount" type="number" step="0.01" placeholder="المبلغ MRU" required>
-      <input id="date" type="date" required>
-      <button type="submit">حفظ العملية</button>
-    </div></form>
-  </section>
+<div id="loginScreen" class="login-box">
+<h2>حسابي</h2>
+<p class="small">كل مشترك بياناته خاصة برقم هاتفه</p>
+<input id="loginPhone" placeholder="رقم هاتف المحل">
+<input id="adminKey" type="password" placeholder="كلمة سر الإدارة (أنت فقط)">
+<button id="loginBtn">دخول</button>
+<div id="msg" style="color:#dc2626;margin-top:10px;font-size:13px"></div>
+<p class="small" style="margin-top:15px">الإدارة الافتراضية: 1234</p>
+</div>
 
-  <section class="section">
-    <h2>سجل العمليات</h2>
-    <div class="tools">
-      <input id="searchTx" placeholder="🔍 بحث في الوصف..." oninput="render()">
-      <button onclick="exportCSV()" style="background:#0f766e">📤 تصدير Excel</button>
-      <button onclick="backupData()" style="background:#475569">💾 نسخة احتياطية</button>
-      <button onclick="document.getElementById('restoreFile').click()" style="background:#334155">📥 استرجاع</button>
-      <input type="file" id="restoreFile" accept=".json" style="display:none" onchange="restoreData(event)">
-    </div>
-    <div class="table-wrap"><table><thead><tr><th>التاريخ</th><th>النوع</th><th>الوصف</th><th>المبلغ</th><th>إجراء</th></tr></thead><tbody id="transactionsList"></tbody></table></div>
-  </section>
+<div id="app" style="display:none">
+<header style="display:flex;justify-content:space-between;align-items:center">
+<div><b id="sName"></b><br><span id="sPhone" class="small" style="color:#cbd5e1"></span><div id="sExpire" class="small" style="color:#fde68a"></div></div>
+<button onclick="location.reload()" style="width:auto;background:#334155;padding:8px 14px">خروج</button>
+</header>
 
-  <section class="section">
-    <h2>إدارة الديون - مع رقم الهاتف وواتساب</h2>
-    <div class="cards">
-      <div class="card debt-in"><h3>ديون لي</h3><div class="amount" id="debtsOwedToMe">0</div></div>
-      <div class="card debt-out"><h3>ديون عليّ</h3><div class="amount" id="debtsIOwe">0</div></div>
-    </div>
-    <form id="debtForm" style="margin-top:15px"><div class="form">
-      <select id="debtType"><option value="owedToMe">دين لي</option><option value="iOwe">دين عليّ</option></select>
-      <input id="debtPerson" placeholder="اسم الشخص" required>
-      <input id="debtPhone" placeholder="رقم واتساب (مثال 222...)" >
-      <input id="debtAmount" type="number" step="0.01" placeholder="المبلغ MRU" required>
-      <input id="debtDate" type="date" required>
-      <button type="submit">حفظ الدين</button>
-    </div></form>
-    <div class="tools"><input id="searchDebt" placeholder="🔍 بحث باسم الشخص..." oninput="renderDebts()"></div>
-    <div class="table-wrap"><table><thead><tr><th>النوع</th><th>الشخص</th><th>الأصل</th><th>المتبقي</th><th>إجراءات</th></tr></thead><tbody id="debtsList"></tbody></table></div>
-  </section>
+<main style="width:93%;max-width:1100px;margin:18px auto">
+
+<div id="adminPanel" class="section" style="display:none;border:2px solid #102b46">
+<h3>👑 لوحة تحكم حسابي</h3>
+<p class="small">أنت لا ترى أموال المشتركين، فقط تدير اشتراكاتهم</p>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px">
+<input id="subName" placeholder="اسم المحل">
+<input id="subPhone" placeholder="رقم الهاتف">
+<select id="subPlan"><option value="30">30 يوم</option><option value="90">90 يوم</option><option value="365">سنة</option></select>
+<button id="addSubBtn" style="background:#0f766e">إضافة</button>
+</div>
+<div id="subsList" style="margin-top:12px"></div>
+</div>
+
+<div id="userApp">
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+<div class="section" style="margin:0;text-align:center"><div class="small">إيرادات</div><b id="tInc">0</b></div>
+<div class="section" style="margin:0;text-align:center"><div class="small">مصروفات</div><b id="tExp">0</b></div>
+<div class="section" style="margin:0;text-align:center"><div class="small">الرصيد</div><b id="tBal">0</b></div>
+</div>
+
+<div class="section">
+<h4>عملية جديدة</h4>
+<div style="display:grid;grid-template-columns:1fr 2fr 1fr auto;gap:8px">
+<select id="type"><option value="income">إيراد</option><option value="expense">مصروف</option></select>
+<input id="desc" placeholder="الوصف">
+<input id="am" type="number" placeholder="المبلغ MRU">
+<button id="addTxBtn">حفظ</button>
+</div>
+<div class="table-wrap"><table><thead><tr><th>التاريخ</th><th>النوع</th><th>الوصف</th><th>المبلغ</th><th></th></tr></thead><tbody id="txList"></tbody></table></div>
+</div>
+
+<div class="section">
+<h4>الديون - واتساب</h4>
+<div style="display:grid;grid-template-columns:1fr 1fr auto;gap:8px">
+<input id="debtPerson" placeholder="اسم الشخص">
+<input id="debtAmount" type="number" placeholder="المبلغ">
+<button id="addDebtBtn" style="background:#7c3aed">حفظ دين</button>
+</div>
+<div id="debtList" style="margin-top:10px"></div>
+</div>
+</div>
+
 </main>
+</div>
 
-<script>
-let transactions = JSON.parse(localStorage.getItem("hisabiTransactions")||"[]");
-let debts = JSON.parse(localStorage.getItem("hisabiDebts")||"[]");
-const today = () => new Date().toISOString().slice(0,10);
-document.getElementById('date').value=today(); document.getElementById('debtDate').value=today();
-const fmt = v => new Intl.NumberFormat('fr-MR').format(v);
-const saveTx = () => localStorage.setItem("hisabiTransactions", JSON.stringify(transactions));
-const saveDebts = () => localStorage.setItem("hisabiDebts", JSON.stringify(debts));
+<script type="module">
+import { initializeApp } from "firebase/app";
+import { getFirestore, doc, setDoc, getDoc, collection, getDocs, deleteDoc, updateDoc, addDoc, onSnapshot } from "firebase/firestore";
 
-function render(){
-  const q = (document.getElementById('searchTx').value||'').toLowerCase();
-  let filtered = transactions.filter(t=> t.description.toLowerCase().includes(q));
-  const inc = filtered.filter(i=>i.type==='income').reduce((s,i)=>s+i.amount,0);
-  const exp = filtered.filter(i=>i.type==='expense').reduce((s,i)=>s+i.amount,0);
-  document.getElementById('totalIncome').textContent=fmt(transactions.filter(i=>i.type==='income').reduce((s,i)=>s+i.amount,0))+' MRU';
-  document.getElementById('totalExpenses').textContent=fmt(transactions.filter(i=>i.type==='expense').reduce((s,i)=>s+i.amount,0))+' MRU';
-  document.getElementById('balance').textContent=fmt(transactions.filter(i=>i.type==='income').reduce((s,i)=>s+i.amount,0)-transactions.filter(i=>i.type==='expense').reduce((s,i)=>s+i.amount,0))+' MRU';
-  const list=document.getElementById('transactionsList'); list.innerHTML='';
-  [...filtered].reverse().forEach(item=>{
-    const tr=document.createElement('tr');
-    tr.innerHTML=`<td>${item.date}</td><td>${item.type==='income'?'إيراد':'مصروف'}</td><td>${item.description}</td><td>${fmt(item.amount)}</td><td><button class="delete" onclick="delTx('${item.id}')">حذف</button></td>`;
-    list.appendChild(tr);
+const firebaseConfig = {
+  apiKey: "AIzaSyDxxxxxxxxxxxxxxxxxxxxxxxx",
+  authDomain: "hesabi-v5.firebaseapp.com",
+  projectId: "hesabi-v5",
+  storageBucket: "hesabi-v5.appspot.com",
+  messagingSenderId: "1234567890",
+  appId: "1:1234567890:web:abcdef123456"
+};
+const ADMIN_PASS = "1234";
+
+let app, db;
+try {
+  app = initializeApp(firebaseConfig);
+  db = getFirestore(app);
+} catch(e){ console.log("Local mode"); }
+
+const $ = id => document.getElementById(id);
+let currentPhone = null;
+let isAdmin = false;
+
+$("loginBtn").onclick = async () => {
+  const phone = $("loginPhone").value.trim();
+  const admin = $("adminKey").value.trim();
+  const msg = $("msg");
+  msg.textContent = "";
+  if(admin === ADMIN_PASS){ isAdmin=true; currentPhone="ADMIN"; startApp({name:"حسابي - المدير",phone:"ADMIN",end:"دائم"}); return; }
+  if(!phone){ msg.textContent="أدخل رقم الهاتف"; return; }
+  if(!db){
+    let subs = JSON.parse(localStorage.getItem('hisabiSubs')||'[]');
+    let sub = subs.find(s=>s.phone===phone);
+    if(!sub){ msg.textContent="غير مسجل"; return; }
+    currentPhone=phone; startApp(sub); return;
+  }
+  try{
+    const ref = doc(db, "subscribers", phone);
+    const snap = await getDoc(ref);
+    if(!snap.exists()){ msg.textContent="رقم غير مسجل"; return; }
+    const data = snap.data();
+    if(!data.active){ msg.textContent="اشتراكك معطل"; return; }
+    if(new Date(data.end) < new Date()){ msg.textContent="انتهى اشتراكك: "+data.end; return; }
+    currentPhone=phone; startApp(data);
+  }catch(err){ msg.textContent="خطأ: "+err.message; }
+};
+
+function startApp(data){
+  $("loginScreen").style.display="none";
+  $("app").style.display="block";
+  $("sName").textContent=data.name;
+  $("sPhone").textContent=data.phone;
+  $("sExpire").textContent= isAdmin ? "وضع الإدارة" : "ينتهي: "+data.end;
+  if(isAdmin){ $("adminPanel").style.display="block"; loadSubs(); }
+  loadUserData();
+}
+
+async function loadSubs(){
+  if(!db){ $("subsList").innerHTML="<div class='small'>ركب Firebase ليظهر المشتركين</div>"; return; }
+  const snap = await getDocs(collection(db, "subscribers"));
+  let html=""; snap.forEach(d=>{
+    const s=d.data(); const exp=new Date(s.end)<new Date();
+    html+=`<div style="display:flex;justify-content:space-between;padding:10px;border-bottom:1px solid #eee"><div><b>${s.name}</b> - ${s.phone}<br><span class="small">${s.end} <span class="badge ${exp||!s.active?'expired':'active'}">${exp?'منتهي':s.active?'ساري':'معطل'}</span></span></div><div style="display:flex;gap:5px"><button onclick="window.renewSub('${s.phone}')" style="width:auto;padding:6px 10px;background:#16a34a">+30</button><button onclick="window.toggleSub('${s.phone}')" style="width:auto;padding:6px 10px;background:#334155">تفعيل</button><button onclick="window.delSub('${s.phone}')" style="width:auto;padding:6px 10px;background:#dc2626">حذف</button></div></div>`;
   });
-  renderDebts();
+  $("subsList").innerHTML=html || "<div class='small'>لا يوجد مشتركين</div>";
 }
-function renderDebts(){
-  const q = (document.getElementById('searchDebt').value||'').toLowerCase();
-  const rem = d => Math.max(0, d.amount - (d.payments||[]).reduce((s,p)=>s+p.amount,0));
-  document.getElementById('debtsOwedToMe').textContent=fmt(debts.filter(d=>d.type==='owedToMe').reduce((s,d)=>s+rem(d),0))+' MRU';
-  document.getElementById('debtsIOwe').textContent=fmt(debts.filter(d=>d.type==='iOwe').reduce((s,d)=>s+rem(d),0))+' MRU';
-  const list=document.getElementById('debtsList'); list.innerHTML='';
-  [...debts].filter(d=>d.person.toLowerCase().includes(q)).reverse().forEach(d=>{
-    const left=rem(d);
-    const tr=document.createElement('tr');
-    tr.innerHTML=`<td>${d.type==='owedToMe'?'لي':'عليّ'}</td><td>${d.person}<br><small>${d.phone||''}</small></td><td>${fmt(d.amount)}</td><td>${fmt(left)}</td>
-    <td><div style="display:flex;gap:5px;flex-wrap:wrap">
-      ${left>0?`<button class="paid" onclick="payDebt('${d.id}')">دفع</button>`:''}
-      <button class="wa" onclick="waRem('${d.person}','${fmt(left)}','${d.phone||''}')">واتساب</button>
-      <button class="delete" onclick="delDebt('${d.id}')">حذف</button>
-    </div></td>`;
-    list.appendChild(tr);
-  });
+window.toggleSub = async (phone)=>{ const ref=doc(db,"subscribers",phone); const snap=await getDoc(ref); await updateDoc(ref,{active:!snap.data().active}); loadSubs(); }
+window.delSub = async (phone)=>{ if(!confirm("حذف نهائي؟")) return; await deleteDoc(doc(db,"subscribers",phone)); loadSubs(); }
+window.renewSub = async (phone)=>{ const ref=doc(db,"subscribers",phone); const snap=await getDoc(ref); let e=new Date(snap.data().end); e.setDate(e.getDate()+30); await updateDoc(ref,{end:e.toISOString().slice(0,10),active:true}); loadSubs(); }
+$("addSubBtn").onclick = async ()=>{
+  const name=$("subName").value.trim(); const phone=$("subPhone").value.trim(); const days=Number($("subPlan").value);
+  if(!name||!phone) return alert("أكمل البيانات");
+  let end=new Date(); end.setDate(end.getDate()+days); const endStr=end.toISOString().slice(0,10);
+  if(!db){ let subs=JSON.parse(localStorage.getItem('hisabiSubs')||'[]'); subs.push({id:Date.now()+'',name,phone,end:endStr,active:true}); localStorage.setItem('hisabiSubs',JSON.stringify(subs)); alert("تمت الإضافة محليا"); $("subName").value=""; $("subPhone").value=""; return; }
+  await setDoc(doc(db,"subscribers",phone),{name,phone,start:new Date().toISOString().slice(0,10),end:endStr,active:true}); $("subName").value=""; $("subPhone").value=""; loadSubs(); alert("تم، يستطيع الدخول برقم "+phone);
+};
+function loadUserData(){
+  if(isAdmin || !db){ renderLocal(); return; }
+  onSnapshot(collection(db,"user_data",currentPhone,"transactions"), snap=>{ let list=[]; snap.forEach(d=>list.push({id:d.id,...d.data()})); renderTransactions(list); });
+  onSnapshot(collection(db,"user_data",currentPhone,"debts"), snap=>{ let list=[]; snap.forEach(d=>list.push({id:d.id,...d.data()})); renderDebts(list); });
 }
-window.delTx=id=>{ if(confirm('حذف؟')){ transactions=transactions.filter(t=>t.id!==id); saveTx(); render(); } }
-window.delDebt=id=>{ if(confirm('حذف الدين؟')){ debts=debts.filter(d=>d.id!==id); saveDebts(); renderDebts(); } }
-window.payDebt=id=>{
-  const d=debts.find(x=>x.id===id); const left=Math.max(0, d.amount - (d.payments||[]).reduce((s,p)=>s+p.amount,0));
-  const raw=prompt('مبلغ الدفعة، المتبقي: '+fmt(left)); if(raw===null) return;
-  const v=Number(raw); if(!v||v<=0||v>left) return alert('مبلغ غير صحيح');
-  d.payments=d.payments||[]; d.payments.push({amount:v, date:today()}); saveDebts(); renderDebts();
+function renderLocal(){
+  if(isAdmin) return;
+  const tx=JSON.parse(localStorage.getItem('tx_'+currentPhone)||'[]');
+  const debts=JSON.parse(localStorage.getItem('debt_'+currentPhone)||'[]');
+  renderTransactions(tx); renderDebts(debts);
 }
-window.waRem=(person, amount, phone)=>{
-  const msg=`السلام عليكم ${person}، تذكير بمبلغ ${amount} MRU المتبقي. شكرا`;
-  const url=phone?`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`:`https://wa.me/?text=${encodeURIComponent(msg)}`;
-  window.open(url,'_blank');
+function renderTransactions(arr){
+  let inc=0,exp=0; let html="";
+  [...arr].reverse().forEach(t=>{ if(t.type==='income') inc+=Number(t.amount||0); else exp+=Number(t.amount||0); html+=`<tr><td>${t.date||''}</td><td>${t.type==='income'?'إيراد':'مصروف'}</td><td>${t.desc||''}</td><td>${t.amount||0}</td><td><button onclick="window.delTx('${t.id}')" style="width:auto;padding:4px 8px;background:#dc2626">حذف</button></td></tr>`; });
+  $("tInc").textContent=inc; $("tExp").textContent=exp; $("tBal").textContent=inc-exp; $("txList").innerHTML=html;
 }
-window.exportCSV=()=>{
-  let csv="التاريخ,النوع,الوصف,المبلغ\n"; transactions.forEach(t=>csv+=`${t.date},${t.type},${t.description},${t.amount}\n`);
-  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download='hisabi.csv'; a.click();
+function renderDebts(arr){
+  let html=""; [...arr].reverse().forEach(d=>{ html+=`<div style="display:flex;justify-content:space-between;padding:8px;border-bottom:1px solid #eee"><span>${d.person} - ${d.amount}</span><button onclick="window.delDebt('${d.id}')" style="width:auto;padding:4px 8px;background:#dc2626">حذف</button></div>`; });
+  $("debtList").innerHTML=html;
 }
-window.backupData=()=>{
-  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify({transactions, debts})],{type:'application/json'}));
-  a.download=`hisabi-backup-${today()}.json`; a.click();
+$("addTxBtn").onclick = async ()=>{
+  const data={type:$("type").value,desc:$("desc").value,amount:Number($("am").value),date:new Date().toISOString().slice(0,10)};
+  if(!data.desc||!data.amount) return alert("أكمل");
+  if(!db){ let a=JSON.parse(localStorage.getItem('tx_'+currentPhone)||'[]'); a.push({...data,id:Date.now()+''}); localStorage.setItem('tx_'+currentPhone,JSON.stringify(a)); $("desc").value=""; $("am").value=""; renderLocal(); return; }
+  await addDoc(collection(db,"user_data",currentPhone,"transactions"), data); $("desc").value=""; $("am").value="";
 }
-window.restoreData=e=>{
-  const r=new FileReader(); r.onload=ev=>{ try{ const o=JSON.parse(ev.target.result); transactions=o.transactions||transactions; debts=o.debts||debts; saveTx(); saveDebts(); render(); alert('تم الاسترجاع'); }catch{ alert('ملف خاطئ'); } }; r.readAsText(e.target.files[0]);
+$("addDebtBtn").onclick = async ()=>{
+  const data={person:$("debtPerson").value,amount:Number($("debtAmount").value),date:new Date().toISOString().slice(0,10)};
+  if(!data.person||!data.amount) return alert("أكمل");
+  if(!db){ let a=JSON.parse(localStorage.getItem('debt_'+currentPhone)||'[]'); a.push({...data,id:Date.now()+''}); localStorage.setItem('debt_'+currentPhone,JSON.stringify(a)); $("debtPerson").value=""; $("debtAmount").value=""; renderLocal(); return; }
+  await addDoc(collection(db,"user_data",currentPhone,"debts"), data); $("debtPerson").value=""; $("debtAmount").value="";
 }
-
-document.getElementById('transactionForm').addEventListener('submit',e=>{
-  e.preventDefault();
-  transactions.push({id:Date.now()+''+Math.random(), type:document.getElementById('type').value, description:document.getElementById('description').value, amount:Number(document.getElementById('amount').value), date:document.getElementById('date').value});
-  saveTx(); e.target.reset(); document.getElementById('date').value=today(); render();
-});
-document.getElementById('debtForm').addEventListener('submit',e=>{
-  e.preventDefault();
-  debts.push({id:Date.now()+''+Math.random(), type:document.getElementById('debtType').value, person:document.getElementById('debtPerson').value, phone:document.getElementById('debtPhone').value, amount:Number(document.getElementById('debtAmount').value), date:document.getElementById('debtDate').value, payments:[]});
-  saveDebts(); e.target.reset(); document.getElementById('debtDate').value=today(); renderDebts();
-});
-render();
+window.delTx = async (id)=>{ if(!db){ let a=JSON.parse(localStorage.getItem('tx_'+currentPhone)||'[]').filter(x=>x.id!==id); localStorage.setItem('tx_'+currentPhone,JSON.stringify(a)); renderLocal(); return; } await deleteDoc(doc(db,"user_data",currentPhone,"transactions",id)); }
+window.delDebt = async (id)=>{ if(!db){ let a=JSON.parse(localStorage.getItem('debt_'+currentPhone)||'[]').filter(x=>x.id!==id); localStorage.setItem('debt_'+currentPhone,JSON.stringify(a)); renderLocal(); return; } await deleteDoc(doc(db,"user_data",currentPhone,"debts",id)); }
+if('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js'); }
 </script>
 </body>
 </html>
