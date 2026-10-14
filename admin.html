@@ -1,14 +1,61 @@
-<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>إدارة الموقع</title>
-<style>*{box-sizing:border-box}body{margin:0;font-family:Tahoma;background:#121212;color:#eee}.header{background:#b71c1c;color:#fff;padding:14px;text-align:center;font-weight:bold}.card{background:#1e1e1e;margin:10px;border-radius:14px;padding:14px}.small{font-size:12px;color:#999}input{width:100%;padding:12px;margin:6px 0;border:1px solid #444;border-radius:10px;background:#2a2a2a;color:#fff}.btn{width:100%;padding:12px;border:none;border-radius:10px;font-weight:bold;cursor:pointer}.btn-blue{background:#0d47a1;color:#fff}.btn-green{background:#2e7d32;color:#fff}.btn-red{background:#c62828;color:#fff}.btn-grey{background:#455a64;color:#fff}.hidden{display:none}.item{border-bottom:1px solid #333;padding:10px 0;display:flex;justify-content:space-between}.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.stat{padding:10px;border-radius:10px;text-align:center;background:#2a2a2a;font-weight:bold}.pending{background:#332600;border:2px dashed #ff9800}.badge{padding:2px 6px;border-radius:10px;font-size:11px;color:#fff}.b-income{background:#2e7d32}.b-expense{background:#c62828}.b-debt{background:#ef6c00}.b-cdebt{background:#0d47a1}</style></head><body>
-<div class="header">🔒 إدارة الموقع - سجل المشتركين</div>
-<div id="login" class="card"><h3 style="text-align:center">دخول الإدارة</h3><input id="ap" type="password" placeholder="رمز الإدارة 1234"><button class="btn btn-red" onclick="aLogin()">دخول</button></div>
-<div id="adm" class="hidden"><div class="card pending"><h3>⏳ طلبات (<span id="pc">0</span>)</h3><div id="pl"></div></div>
-<div class="card"><h3>📊 إحصائيات</h3><div class="stat-grid"><div class="stat">نشطين<div id="aa">0</div></div><div class="stat">منتهية<div id="ae">0</div></div><div class="stat">مداخيل<div id="ai">0</div></div><div class="stat">معلقة<div id="apc">0</div></div></div></div>
-<div class="card"><h3>🔍 سجل المشتركين</h3><input id="as" placeholder="بحث بالاسم أو الهاتف" oninput="rA()"><div id="al"></div></div>
-<div class="card" id="ud" style="display:none"><h3 id="udT"></h3><div id="udS" class="stat-grid"></div><div id="udL" style="margin-top:10px"></div><button class="btn btn-grey" onclick="ud.style.display='none'">إغلاق</button></div>
-<div class="card"><h3>➕ إضافة مشترك مباشر</h3><input id="an" placeholder="الاسم"><input id="aph" placeholder="رقم الهاتف"><input id="apa" placeholder="كلمة سر المشترك"><input id="apr" type="number" placeholder="سعر الاشتراك"><button class="btn btn-blue" onclick="aAdd()">إضافة</button></div>
-<button class="btn btn-grey" style="margin:12px" onclick="lo()">خروج</button></div>
+<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ادارة الموقع</title>
+<style>body{margin:0;font-family:Tahoma;background:#121212;color:#fff}.header{background:#b71c1c;color:#fff;padding:14px;text-align:center;font-weight:bold}.card{background:#1e1e1e;margin:12px;border-radius:12px;padding:14px}input{width:95%;padding:13px;margin:8px 0;border-radius:10px;border:1px solid #555;background:#2a2a2a;color:#fff;font-size:16px}.btn{width:100%;padding:13px;border:none;border-radius:10px;font-weight:bold;cursor:pointer;font-size:16px}.btn-red{background:#c62828;color:#fff}.btn-blue{background:#0d47a1;color:#fff}.btn-green{background:#2e7d32;color:#fff;width:auto;padding:6px 12px}.item{padding:10px 0;border-bottom:1px solid #333;display:flex;justify-content:space-between}.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.stat{background:#2a2a2a;padding:10px;border-radius:8px;text-align:center}.hidden{display:none!important}</style>
+</head><body>
+<div class="header">إدارة الموقع - سجل المهن</div>
+
+<div id="loginBox" class="card" style="margin-top:40px">
+<h2 style="text-align:center">🔒 دخول الإدارة</h2>
+<input id="passInput" type="password" placeholder="اكتب الرمز هنا">
+<button class="btn btn-red" onclick="checkPass()">دخول</button>
+<p style="text-align:center;color:#888;font-size:13px">الرمز الافتراضي: 1234</p>
+</div>
+
+<div id="adminBox" class="hidden">
+<div class="card"><h3>الطلبات (<span id="pc">0</span>)</h3><div id="pl"></div></div>
+<div class="card"><h3>المشتركين</h3><input id="as" placeholder="بحث" oninput="showAll()"><div id="al"></div></div>
+<div class="card" id="ud" style="display:none"><h3 id="udT"></h3><div id="udS" class="stat-grid"></div><div id="udL"></div><button class="btn btn-grey" style="background:#455a64;color:#fff" onclick="document.getElementById('ud').style.display='none'">اغلاق</button></div>
+<div class="card"><button class="btn" style="background:#333;color:#fff" onclick="logout()">خروج</button></div>
+</div>
+
 <script>
-let db=JSON.parse(localStorage.getItem('hisabi_final_v3')||'{"subs":[],"trans":[],"pends":[]}');function sv(){localStorage.setItem('hisabi_final_v3',JSON.stringify(db))}
-function aLogin(){if(ap.value!=='1234'){alert('خطأ');return}login.classList.add('hidden');adm.classList.remove('hidden');rA()}
-function rA(){let q=as.value.toLowerCase();pc.innerText=db.pends.length;apc.innerText=db.pends.length;pl.innerHTML=db.pends.length?'':'لا طلبات';db.pends.forEach((p,i)=>{pl.innerHTML+=`<div class="item pending"><div><b>${p.name}</b> ${p.phone}<br><small>${p.dur} شهر</small></div><div><button onclick="apv(${i})" class="btn btn-green" style="width:auto;padding:6px">موافقة</button> <button onclick="rej(${i})" class="btn btn-red" style="width:auto;padding:6px">رفض</button></div></div>`});al.innerHTML='';db.subs.filter(s=>s.name.toLowerCase().includes(q)||s.phone.includes(q)).forEach(s=>{let ex=new Date(s.expiry),my=db.trans.filter(t=>t.phone==s.phone);let net=my.filter(t=>t.type=='income').reduce((a,b)=>a+b.amount,0)-my.filter(t=>t.type=='expense').reduce((a,b)=>a+b.amount,0);al.innerHTML+=`<div class="item"><div><b>${s.name}</b> ${s.phone}<br><small>ينتهي ${ex.toLocaleDateString()} | رصيده: ${net} | سره: ${s.pass}</small><br><span style="color:#4fc3f7;cursor:pointer" onclick="view('${s.phone}')">👁 عرض محاسبته الدقيقة</span></div><div><button onclick="ren('${s.phone}')" class="btn btn-blue" style="width:auto;padding:5px">
+const ADMIN_PASSWORD = "1234"; // <--- هنا تغير الرمز الذي تريده
+
+let db = JSON.parse(localStorage.getItem('hisabi_final_v3')||'{"subs":[],"trans":[],"pends":[]}');
+function save(){localStorage.setItem('hisabi_final_v3',JSON.stringify(db))}
+
+function checkPass(){
+  let entered = document.getElementById('passInput').value.trim();
+  if(entered === ADMIN_PASSWORD){
+    document.getElementById('loginBox').classList.add('hidden');
+    document.getElementById('adminBox').classList.remove('hidden');
+    showAll();
+  } else {
+    alert('الرمز خطأ! الرمز الصحيح هو: ' + ADMIN_PASSWORD);
+  }
+}
+
+function logout(){
+  document.getElementById('adminBox').classList.add('hidden');
+  document.getElementById('loginBox').classList.remove('hidden');
+  document.getElementById('passInput').value='';
+}
+
+function showAll(){
+  let q=(document.getElementById('as')?.value||'').toLowerCase();
+  document.getElementById('pc').innerText=db.pends.length;
+  let pl=document.getElementById('pl'); pl.innerHTML=db.pends.length?'':'لا يوجد طلبات';
+  db.pends.forEach((p,i)=>{
+    pl.innerHTML+=`<div class="item"><div><b>${p.name}</b><br>${p.phone}</div><div><button onclick="approve(${i})" class="btn-green">موافقة</button> <button onclick="reject(${i})" class="btn btn-red" style="width:auto;padding:6px">رفض</button></div></div>`;
+  });
+  let al=document.getElementById('al'); al.innerHTML='';
+  db.subs.filter(s=>s.name.toLowerCase().includes(q)||s.phone.includes(q)).forEach(s=>{
+    al.innerHTML+=`<div class="item"><div><b>${s.name}</b> ${s.phone}<br><small>سره: ${s.pass} | ينتهي: ${new Date(s.expiry).toLocaleDateString()}</small><br><span style="color:#4fc3f7;cursor:pointer" onclick="viewU('${s.phone}')">عرض حسابه</span></div><div><button onclick="delU('${s.phone}')" class="btn btn-red" style="width:auto;padding:6px">حذف</button></div></div>`;
+  });
+}
+function approve(i){let p=db.pends[i]; let ex=new Date(); ex.setMonth(ex.getMonth()+p.dur); let price=prompt('سعر الاشتراك؟','0'); db.subs.push({name:p.name,phone:p.phone,pass:p.pass,dur:p.dur,price:parseFloat(price||0),start:new Date().toISOString(),expiry:ex.toISOString()}); db.pends.splice(i,1); save(); showAll();}
+function reject(i){db.pends.splice(i,1); save(); showAll();}
+function delU(ph){if(confirm('حذف؟')){db.subs=db.subs.filter(s=>s.phone!=ph); db.trans=db.trans.filter(t=>t.phone!=ph); save(); showAll();}}
+function viewU(phone){let s=db.subs.find(x=>x.phone==phone); let my=db.trans.filter(t=>t.phone==phone); let inc=my.filter(t=>t.type=='income').reduce((a,b)=>a+b.amount,0), exp=my.filter(t=>t.type=='expense').reduce((a,b)=>a+b.amount,0); document.getElementById('ud').style.display='block'; document.getElementById('udT').innerText=s.name+' ('+phone+')'; document.getElementById('udS').innerHTML=`<div class="stat">مداخيل ${inc}</div><div class="stat">مصاريف ${exp}</div>`; let l=document.getElementById('udL'); l.innerHTML=''; my.reverse().forEach(t=>{l.innerHTML+=`<div class="item">${t.type} ${t.amount} ${t.note||''}</div>`});}
+showAll();
+</script>
+</body></html>
