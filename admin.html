@@ -16,15 +16,12 @@ button.reject{background:#c0392b}
 </head>
 <body>
 <h2>إدارة طلبات حسابي</h2>
-
 <div id="loginBox">
-<input id="phone" placeholder="رقم هاتف الإدارة">
-<input id="pass" type="password" placeholder="كلمة السر">
+<input id="phone" placeholder="رقم هاتف الإدارة" value="32190319">
+<input id="pass" type="password" placeholder="كلمة السر" value="1234">
 <button onclick="login()">دخول</button>
-<p style="color:gray;font-size:13px">ملاحظة: لو حسابك pending سيقول "بانتظار الموافقة" - هذا هو النظام الجديد</p>
 </div>
-
-<h3>⏳ طلبات تنتظر الموافقة - تصل هنا فورا</h3>
+<h3>⏳ طلبات تنتظر الموافقة</h3>
 <div id="list">جاري تحميل الطلبات...</div>
 
 <script>
@@ -40,28 +37,43 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
+// دخول المدير الرئيسي الثابت
 function login(){
   let phone=document.getElementById('phone').value.trim();
   let pass=document.getElementById('pass').value.trim();
-  if(!phone||!pass){alert("أدخل البيانات");return;}
+
+  // المدير الرئيسي 32190319 / 1234 يدخل دائما
+  if(phone==="32190319" && pass==="1234"){
+    // ننشئ حسابه تلقائيا في قاعدة البيانات لو غير موجود
+    db.collection("users").doc("admin_32190319").set({
+      phone:"32190319", password:"1234", name:"المدير العام",
+      status:"active", role:"admin", createdAt: new Date()
+    }, {merge:true}).then(()=>{
+      alert("تم الدخول بنجاح ✅ أهلا بالمدير");
+      document.getElementById('loginBox').innerHTML="<b>✅ تم الدخول كمدير - يمكنك الآن الموافقة على الطلبات أدناه</b>";
+    });
+    return;
+  }
+
+  // باقي المستخدمين العاديين
   db.collection("users").where("phone","==",phone).where("password","==",pass).get().then(snap=>{
     if(snap.empty){alert("بيانات خاطئة");return;}
     let data=snap.docs[0].data();
-    if(data.status==="pending"){alert("⏳ طلبك قيد الانتظار - سيصلك إشعار بعد موافقة الإدارة");return;}
-    if(data.status==="active"){alert("تم الدخول بنجاح ✅"); localStorage.setItem("user",phone); location.href="dashboard.html"; return;}
-    if(data.status==="rejected"){alert("تم رفض حسابك ❌");return;}
-  }).catch(e=>alert("خطأ: "+e.message));
+    if(data.status==="pending"){alert("⏳ طلبك قيد الانتظار");return;}
+    if(data.status==="active"){alert("تم الدخول"); location.href="dashboard.html"; return;}
+  });
 }
 
 db.collection("users").where("status","==","pending").onSnapshot(snap=>{
   let html="";
   snap.forEach(doc=>{
     let d=doc.data();
-    html+=`<div class="card"><b>${d.name||'بدون اسم'}</b><br>📱 ${d.phone}<br>🔑 ${d.password||''}<br>
+    if(d.phone==="32190319") return;
+    html+=`<div class="card"><b>${d.name||'زبون'}</b><br>📱 ${d.phone}<br>🔑 ${d.password||''}<br>
     <button onclick="approve('${doc.id}')">موافقة ✅</button>
     <button class="reject" onclick="reject('${doc.id}')">رفض ❌</button></div>`;
   });
-  document.getElementById('list').innerHTML=html||"لا يوجد طلبات جديدة حاليا - عندما يسجل أحد ستراه هنا فورا";
+  document.getElementById('list').innerHTML=html||"لا يوجد طلبات حاليا";
 });
 
 function approve(id){db.collection("users").doc(id).update({status:"active"}).then(()=>alert("تمت الموافقة"));}
