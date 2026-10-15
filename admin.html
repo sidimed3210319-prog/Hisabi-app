@@ -1,57 +1,71 @@
 <!DOCTYPE html>
-<html dir="rtl">
+<html dir="rtl" lang="ar">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>حسابي - دخول</title>
+<title>إدارة - حسابي</title>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<style>
+body{font-family:Tahoma;padding:20px;background:#f0f2f5}
+.card{background:white;padding:15px;margin:10px 0;border-radius:8px;box-shadow:0 2px 5px #0001;border-right:5px solid #f39c12}
+input{width:95%;padding:12px;margin:5px 0;border:1px solid #ccc;border-radius:6px}
+button{padding:10px 18px;background:#27ae60;color:white;border:none;border-radius:6px;cursor:pointer}
+button.reject{background:#c0392b}
+</style>
 </head>
 <body>
+<h2>إدارة طلبات حسابي</h2>
+
+<div id="loginBox">
+<input id="phone" placeholder="رقم هاتف الإدارة">
+<input id="pass" type="password" placeholder="كلمة السر">
+<button onclick="login()">دخول</button>
+<p style="color:gray;font-size:13px">ملاحظة: لو حسابك pending سيقول "بانتظار الموافقة" - هذا هو النظام الجديد</p>
+</div>
+
+<h3>⏳ طلبات تنتظر الموافقة - تصل هنا فورا</h3>
+<div id="list">جاري تحميل الطلبات...</div>
+
 <script>
-// استبدل هذا بالإعدادات من Firebase Console > Project Settings
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "hisabiapp-c3a50.firebaseapp.com",
-  projectId: "hisabiapp-c3a50"
+  apiKey: "AIzaSyBidW6S_uJixbQzyS_gB6wl60wDVdPS4Oo",
+  authDomain: "hisebi-app-aa6ca.firebaseapp.com",
+  projectId: "hisebi-app-aa6ca",
+  storageBucket: "hisebi-app-aa6ca.firebasestorage.app",
+  messagingSenderId: "56695697718",
+  appId: "1:56695697718:web:fb4b04cd84840beb794397",
+  measurementId: "G-NL854CTRNT"
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-function register(){
-  let phone = document.getElementById('phone').value;
-  let name = document.getElementById('name').value;
-  let pass = document.getElementById('pass').value;
-
-  // هذا السطر هو الحل - يحفظ في السحابة ويصل للإدارة فورا
-  db.collection("users").add({
-    phone: phone,
-    name: name,
-    password: pass,
-    status: "pending",
-    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-  }).then(()=>{
-    alert("تم إرسال طلبك للإدارة، انتظر الموافقة ⏳");
-  });
-}
-
 function login(){
-  let phone = document.getElementById('phone').value;
-  let pass = document.getElementById('pass').value;
+  let phone=document.getElementById('phone').value.trim();
+  let pass=document.getElementById('pass').value.trim();
+  if(!phone||!pass){alert("أدخل البيانات");return;}
   db.collection("users").where("phone","==",phone).where("password","==",pass).get().then(snap=>{
-    if(snap.empty){ alert("بيانات خاطئة"); return; }
-    let u = snap.docs[0].data();
-    if(u.status=="pending"){
-      alert("حسابك قيد المراجعة من الإدارة");
-    } else if(u.status=="active"){
-      localStorage.setItem("user", phone);
-      location.href="dashboard.html";
-    } else {
-      alert("تم رفض حسابك");
-    }
-  });
+    if(snap.empty){alert("بيانات خاطئة");return;}
+    let data=snap.docs[0].data();
+    if(data.status==="pending"){alert("⏳ طلبك قيد الانتظار - سيصلك إشعار بعد موافقة الإدارة");return;}
+    if(data.status==="active"){alert("تم الدخول بنجاح ✅"); localStorage.setItem("user",phone); location.href="dashboard.html"; return;}
+    if(data.status==="rejected"){alert("تم رفض حسابك ❌");return;}
+  }).catch(e=>alert("خطأ: "+e.message));
 }
-document.addEventListener('keyup',e=>{if(e.key==='Enter')login();});
+
+db.collection("users").where("status","==","pending").onSnapshot(snap=>{
+  let html="";
+  snap.forEach(doc=>{
+    let d=doc.data();
+    html+=`<div class="card"><b>${d.name||'بدون اسم'}</b><br>📱 ${d.phone}<br>🔑 ${d.password||''}<br>
+    <button onclick="approve('${doc.id}')">موافقة ✅</button>
+    <button class="reject" onclick="reject('${doc.id}')">رفض ❌</button></div>`;
+  });
+  document.getElementById('list').innerHTML=html||"لا يوجد طلبات جديدة حاليا - عندما يسجل أحد ستراه هنا فورا";
+});
+
+function approve(id){db.collection("users").doc(id).update({status:"active"}).then(()=>alert("تمت الموافقة"));}
+function reject(id){db.collection("users").doc(id).update({status:"rejected"}).then(()=>alert("تم الرفض"));}
 </script>
 </body>
 </html>
