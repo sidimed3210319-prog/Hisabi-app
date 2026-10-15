@@ -1,29 +1,42 @@
+
 <!DOCTYPE html>
 <html dir="rtl" lang="ar">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>إدارة - حسابي</title>
+<title>لوحة الإدارة - حسابي</title>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 <style>
-body{font-family:Tahoma;padding:20px;background:#f0f2f5}
-.card{background:white;padding:15px;margin:10px 0;border-radius:8px;box-shadow:0 2px 5px #0001;border-right:5px solid #f39c12}
-input{width:95%;padding:12px;margin:5px 0;border:1px solid #ccc;border-radius:6px}
-button{padding:10px 18px;background:#27ae60;color:white;border:none;border-radius:6px;cursor:pointer}
-button.reject{background:#c0392b}
+body{font-family:Tahoma;background:#f0f2f5;margin:0;padding:10px}
+.card{background:#fff;padding:15px;border-radius:14px;margin:10px 0;box-shadow:0 2px 8px #0001}
+input{width:95%;padding:12px;margin:5px 0;border:1px solid #ccc;border-radius:10px}
+.btn{padding:10px 16px;border:none;border-radius:10px;font-weight:bold;cursor:pointer}
+.btn-blue{background:#0d47a1;color:#fff;width:100%}.btn-green{background:#2e7d32;color:#fff}.btn-red{background:#c62828;color:#fff}
+.item{border-bottom:1px solid #eee;padding:12px 0;display:flex;justify-content:space-between;align-items:center}
+.small{font-size:11px;color:#666}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:10px 0}
+.stat{padding:12px;border-radius:12px;text-align:center;font-weight:bold}
 </style>
 </head>
 <body>
-<h2>إدارة طلبات حسابي</h2>
-<div id="loginBox">
-<input id="phone" placeholder="رقم هاتف الإدارة" value="32190319">
+<h2 style="text-align:center">🛠️ إدارة حسابي</h2>
+<div id="loginBox" class="card">
+<input id="phone" placeholder="رقم الإدارة" value="32190319">
 <input id="pass" type="password" placeholder="كلمة السر" value="1234">
-<button onclick="login()">دخول</button>
+<button class="btn btn-blue" onclick="login()">دخول الإدارة</button>
+<div id="msg" class="small" style="color:red;text-align:center"></div>
 </div>
-<h3>⏳ طلبات تنتظر الموافقة</h3>
-<div id="list">جاري تحميل الطلبات...</div>
-
+<div id="dash" style="display:none">
+<div class="stat-grid">
+<div class="stat" style="background:#e3f2fd">⏳ معلق<div id="cPend" style="font-size:24px">0</div></div>
+<div class="stat" style="background:#e8f5e9">✅ نشط<div id="cActive" style="font-size:24px">0</div></div>
+<div class="stat" style="background:#ffebee">❌ مرفوض<div id="cReject" style="font-size:24px">0</div></div>
+</div>
+<div class="card"><h3>⏳ طلبات جديدة</h3><div id="pendList"></div></div>
+<div class="card"><h3>✅ المشتركين مع التاريخ</h3><div id="activeList"></div></div>
+<button class="btn" style="background:#455a64;color:#fff;width:100%" onclick="location.reload()">خروج</button>
+</div>
 <script>
 const firebaseConfig = {
   apiKey: "AIzaSyBidW6S_uJixbQzyS_gB6wl60wDVdPS4Oo",
@@ -31,53 +44,32 @@ const firebaseConfig = {
   projectId: "hisebi-app-aa6ca",
   storageBucket: "hisebi-app-aa6ca.firebasestorage.app",
   messagingSenderId: "56695697718",
-  appId: "1:56695697718:web:fb4b04cd84840beb794397",
-  measurementId: "G-NL854CTRNT"
+  appId: "1:56695697718:web:fb4b04cd84840beb794397"
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
-
-// دخول المدير الرئيسي الثابت
 function login(){
-  let phone=document.getElementById('phone').value.trim();
-  let pass=document.getElementById('pass').value.trim();
-
-  // المدير الرئيسي 32190319 / 1234 يدخل دائما
-  if(phone==="32190319" && pass==="1234"){
-    // ننشئ حسابه تلقائيا في قاعدة البيانات لو غير موجود
-    db.collection("users").doc("admin_32190319").set({
-      phone:"32190319", password:"1234", name:"المدير العام",
-      status:"active", role:"admin", createdAt: new Date()
-    }, {merge:true}).then(()=>{
-      alert("تم الدخول بنجاح ✅ أهلا بالمدير");
-      document.getElementById('loginBox').innerHTML="<b>✅ تم الدخول كمدير - يمكنك الآن الموافقة على الطلبات أدناه</b>";
-    });
-    return;
-  }
-
-  // باقي المستخدمين العاديين
-  db.collection("users").where("phone","==",phone).where("password","==",pass).get().then(snap=>{
-    if(snap.empty){alert("بيانات خاطئة");return;}
-    let data=snap.docs[0].data();
-    if(data.status==="pending"){alert("⏳ طلبك قيد الانتظار");return;}
-    if(data.status==="active"){alert("تم الدخول"); location.href="dashboard.html"; return;}
-  });
+ let ph=document.getElementById('phone').value.trim();
+ let pa=document.getElementById('pass').value.trim();
+ if(ph==="32190319" && pa==="1234"){
+   document.getElementById('loginBox').style.display='none';
+   document.getElementById('dash').style.display='block';
+   loadData();
+   db.collection("users").doc("admin_32190319").set({phone:"32190319",password:"1234",name:"المدير العام",status:"active",role:"admin",createdAt:new Date()},{merge:true});
+ } else {
+   document.getElementById('msg').innerText='رقم أو كلمة سر خاطئة - استخدم 32190319 / 1234';
+ }
 }
-
-db.collection("users").where("status","==","pending").onSnapshot(snap=>{
-  let html="";
-  snap.forEach(doc=>{
-    let d=doc.data();
-    if(d.phone==="32190319") return;
-    html+=`<div class="card"><b>${d.name||'زبون'}</b><br>📱 ${d.phone}<br>🔑 ${d.password||''}<br>
-    <button onclick="approve('${doc.id}')">موافقة ✅</button>
-    <button class="reject" onclick="reject('${doc.id}')">رفض ❌</button></div>`;
-  });
-  document.getElementById('list').innerHTML=html||"لا يوجد طلبات حاليا";
-});
-
-function approve(id){db.collection("users").doc(id).update({status:"active"}).then(()=>alert("تمت الموافقة"));}
-function reject(id){db.collection("users").doc(id).update({status:"rejected"}).then(()=>alert("تم الرفض"));}
-</script>
-</body>
-</html>
+function loadData(){
+ db.collection("users").onSnapshot(snap=>{
+   let pend=[], active=[], reject=[];
+   snap.forEach(doc=>{
+     let d=doc.data(); d.id=doc.id;
+     if(d.phone=="32190319"||d.phone=="0000") return;
+     if(d.status=="pending") pend.push(d);
+     else if(d.status=="active") active.push(d);
+     else if(d.status=="rejected") reject.push(d);
+   });
+   document.getElementById('cPend').innerText=pend.length;
+   document.getElementById('cActive').innerText=active.length;
+   document.getElement
