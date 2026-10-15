@@ -1,4 +1,6 @@
 <!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>حسابي - المدير المالي لمشروعك</title>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:Tahoma;background:#f0f4f8}.header{background:#0d47a1;color:#fff;padding:14px;text-align:center;font-weight:bold;position:sticky;top:0;z-index:10}
 .card{background:#fff;margin:10px;border-radius:14px;padding:14px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
@@ -16,9 +18,9 @@ input,select{width:100%;padding:11px;margin:5px 0;border:1px solid #ccc;border-r
 </style></head><body>
 <div class="header">💼 حسابي - المدير المالي لمشروعك</div>
 <div id="pub"><div class="card"><div class="tabs"><div class="tab active" id="t1" onclick="st('login')">دخول</div><div class="tab" id="t2" onclick="st('reg')">تسجيل</div></div>
-<div id="lb"><h3 style="text-align:center">دخول</h3><input id="lp" placeholder="رقم الهاتف"><input id="lpa" type="password" placeholder="كلمة السر"><button class="btn btn-blue" onclick="sLogin()">دخول</button><div class="small" style="text-align:center">إدارة: 0000 / admin123</div><div id="lm" class="small" style="color:red;text-align:center"></div></div>
+<div id="lb"><h3 style="text-align:center">دخول</h3><input id="lp" placeholder="رقم الهاتف"><input id="lpa" type="password" placeholder="كلمة السر"><button class="btn btn-blue" onclick="sLogin()">دخول</button><div class="small" style="text-align:center">إدارة: 32190319 / 1234 أو 0000 / admin123</div><div id="lm" class="small" style="color:red;text-align:center"></div></div>
 <div id="rb" class="hidden"><h3 style="text-align:center">طلب اشتراك</h3><input id="rn" placeholder="اسمك / المحل"><input id="rp" placeholder="هاتفك"><input id="rpa" type="password" placeholder="كلمة سر"><select id="rd"><option value="1">شهر</option><option value="3" selected>3 أشهر</option><option value="6">6 أشهر</option><option value="12">سنة</option></select><button class="btn btn-green" onclick="sReq()">إرسال طلب</button><div id="rm" class="small" style="text-align:center"></div></div></div></div>
-<div id="admin" class="hidden"><div class="card"><h3>🛠️ لوحة الإدارة</h3><div id="pendList"></div><button class="btn btn-grey" onclick="lo()">خروج</button></div></div>
+<div id="admin" class="hidden"><div class="card"><h3>🛠️ لوحة الإدارة - الطلبات المعلقة تصل الآن من كل الهواتف</h3><div id="pendList">جاري تحميل الطلبات من السيرفر...</div><button class="btn btn-grey" onclick="lo()">خروج</button></div></div>
 <div id="sub" class="hidden"><div class="card"><h3 id="sh" style="margin:0"></h3>
 <div class="subInfo"><div>📅 اشترك: <span id="sStart">-</span> | ⏰ ينتهي: <span id="sEnd">-</span> | ⌛ <span id="sLeft"></span></div><div class="small" id="ss"></div></div>
 <div class="mode-tabs">
@@ -40,10 +42,10 @@ input,select{width:100%;padding:11px;margin:5px 0;border:1px solid #ccc;border-r
 <div id="traderAdd" class="card"><h4>➕ تاجر</h4><select id="ot"><option value="income">💰 مبيعة</option><option value="expense">💸 شراء</option><option value="debt">📉 دين عليّ</option><option value="clientDebt">📈 دين لي</option></select><input id="oa" type="number" placeholder="المبلغ"><input id="on" placeholder="البيان"><input id="od" type="date"><button class="btn btn-blue" onclick="aOp()">حفظ في دفتر التاجر ✓</button></div>
 
 <div id="personalAdd" class="card hidden">
-<h4>👤 حساب شخص عادي - جديد منفصل</h4>
+<h4>👤 حساب شخص عادي</h4>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-<div style="background:#e8f5e9;padding:10px;border-radius:12px"><b>💵 إضافة دخل - راتب / تحويل</b><select id="otPIncome"><option value="راتب">💰 راتب</option><option value="تحويل">🔄 تحويل</option><option value="بيع">📦 بيع</option><option value="دخل آخر">💵 دخل آخر</option></select><input id="oaPIncome" type="number" placeholder="المبلغ"><input id="onPIncome" placeholder="المصدر"><input id="odPIncome" type="date"><button class="btn btn-green" onclick="aOpPIncome()">حفظ دخل ✓</button></div>
-<div style="background:#ffebee;padding:10px;border-radius:12px"><b>💸 إضافة مصروف - أكل / كراء / فواتير</b><select id="otPExpense"><option value="أكل">🍽️ أكل</option><option value="كراء">🏠 كراء</option><option value="فواتير">💡 فواتير</option><option value="نقل">🚕 نقل</option><option value="أخرى">💸 أخرى</option></select><input id="oaPExpense" type="number" placeholder="المبلغ"><input id="onPExpense" placeholder="البيان"><input id="odPExpense" type="date"><button class="btn btn-blue" style="background:#c62828" onclick="aOpPExpense()">حفظ مصروف ✓</button></div>
+<div style="background:#e8f5e9;padding:10px;border-radius:12px"><b>💵 إضافة دخل</b><select id="otPIncome"><option value="راتب">💰 راتب</option><option value="تحويل">🔄 تحويل</option><option value="بيع">📦 بيع</option><option value="دخل آخر">💵 دخل آخر</option></select><input id="oaPIncome" type="number" placeholder="المبلغ"><input id="onPIncome" placeholder="المصدر"><input id="odPIncome" type="date"><button class="btn btn-green" onclick="aOpPIncome()">حفظ دخل ✓</button></div>
+<div style="background:#ffebee;padding:10px;border-radius:12px"><b>💸 إضافة مصروف</b><select id="otPExpense"><option value="أكل">🍽️ أكل</option><option value="كراء">🏠 كراء</option><option value="فواتير">💡 فواتير</option><option value="نقل">🚕 نقل</option><option value="أخرى">💸 أخرى</option></select><input id="oaPExpense" type="number" placeholder="المبلغ"><input id="onPExpense" placeholder="البيان"><input id="odPExpense" type="date"><button class="btn btn-blue" style="background:#c62828" onclick="aOpPExpense()">حفظ مصروف ✓</button></div>
 </div>
 </div>
 
@@ -72,23 +74,91 @@ input,select{width:100%;padding:11px;margin:5px 0;border:1px solid #ccc;border-r
 <div id="suppliersAdd" class="card hidden">
 <h4>🏭 الموردين</h4>
 <input id="supName" placeholder="اسم المورد"><input id="supPhone" placeholder="هاتف"><input id="supNote" placeholder="ملاحظة"><button class="btn btn-green" onclick="addSupplier()">إضافة مورد</button>
-<h4 style="margin-top:10px">📥 فاتورة شراء من مورد (تزيد المخزون)</h4>
+<h4 style="margin-top:10px">📥 فاتورة شراء من مورد</h4>
 <select id="supSelect"></select><select id="supProdSelect"></select><input id="supQty" type="number" placeholder="الكمية"><input id="supPrice" type="number" placeholder="الإجمالي"><input id="supPaid" type="number" placeholder="المدفوع"><input id="supDate" type="date"><button class="btn btn-blue" onclick="addSupPurchase()">حفظ فاتورة ✓</button>
 <div id="supList" style="margin-top:10px"></div><div id="supPurchases" style="margin-top:10px"></div>
 </div>
 
 <div class="card"><h4>📋 العمليات</h4><div id="ol"></div></div><button class="btn btn-grey" style="margin:12px" onclick="lo()">خروج</button></div>
 <script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBidW6S_uJixbQzyS_gB6wl60wDVdPS4Oo",
+  authDomain: "hisebi-app-aa6ca.firebaseapp.com",
+  projectId: "hisebi-app-aa6ca",
+  storageBucket: "hisebi-app-aa6ca.firebasestorage.app",
+  messagingSenderId: "56695697718",
+  appId: "1:56695697718:web:fb4b04cd84840beb794397"
+};
+firebase.initializeApp(firebaseConfig);
+const fdb = firebase.firestore();
+
 let db=JSON.parse(localStorage.getItem('hisabi_final_v3')||'{"subs":[],"trans":[],"pends":[],"workers":[],"salaries":[],"companyOps":[],"products":[],"suppliers":[],"supPurchases":[]}');
 ['workers','salaries','companyOps','products','suppliers','supPurchases'].forEach(k=>{if(!db[k]) db[k]=[]});
 function sv(){localStorage.setItem('hisabi_final_v3',JSON.stringify(db))}let cur=null;let currentMode=localStorage.getItem('hisabi_mode')||'trader';
 ['od','odPIncome','odPExpense','cDate','payDate','supDate'].forEach(id=>{let el=document.getElementById(id); if(el) el.valueAsDate=new Date();});
 function st(t){lb.classList.toggle('hidden',t!='login');rb.classList.toggle('hidden',t!='reg');t1.classList.toggle('active',t=='login');t2.classList.toggle('active',t=='reg')}
-function sReq(){let n=rn.value.trim(),p=rp.value.trim(),pa=rpa.value.trim(),d=parseInt(rd.value);if(!n||!p||!pa){rm.innerText='أكمل';return}if(db.subs.find(s=>s.phone==p)||db.pends.find(s=>s.phone==p)){rm.innerText='مسجل';return}db.pends.push({name:n,phone:p,pass:pa,dur:d,date:new Date().toISOString()});sv();rm.style.color='green';rm.innerText='✅ تم إرسال طلبك';}
-function sLogin(){let p=lp.value.trim(),pa=lpa.value.trim();if(p=='0000'&&pa=='admin123'){pub.classList.add('hidden');admin.classList.remove('hidden');renderPends();return;}let s=db.subs.find(x=>x.phone==p&&x.pass==pa);if(!s){lm.innerText='خطأ أو لم تتم الموافقة';return}if(new Date(s.expiry)<new Date()){lm.innerText='انتهى اشتراكك '+s.expiry.split('T')[0];return}cur=s;pub.classList.add('hidden');sub.classList.remove('hidden');sh.innerText='مرحبا '+s.name;sStart.innerText=new Date(s.start).toLocaleDateString();sEnd.innerText=new Date(s.expiry).toLocaleDateString();let diff=Math.ceil((new Date(s.expiry)-new Date())/(1000*60*60*24));sLeft.innerText=diff+' يوم متبقي';sLeft.style.color=diff<7?'red':'green';ss.innerText=s.start.split('T')[0]+' → '+s.expiry.split('T')[0];setMode(currentMode);}
-function renderPends(){if(!db.pends.length){pendList.innerHTML='لا طلبات';return}pendList.innerHTML='';db.pends.forEach((p,i)=>{pendList.innerHTML+=`<div class="item"><div><b>${p.name}</b> ${p.phone}<br><small>${p.dur} شهر</small></div><div><button class="btn btn-green" style="width:auto" onclick="approve(${i})">قبول</button> <button class="btn btn-red" onclick="reject(${i})">✕</button></div></div>`})}
+function sReq(){
+ let n=rn.value.trim(),p=rp.value.trim(),pa=rpa.value.trim(),d=parseInt(rd.value);
+ if(!n||!p||!pa){rm.innerText='أكمل';return}
+ if(db.subs.find(s=>s.phone==p)||db.pends.find(s=>s.phone==p)){rm.innerText='مسجل';return}
+ rm.innerText='⏳ جاري إرسال طلبك للإدارة...';
+ // 1- حفظ محلي قديم
+ db.pends.push({name:n,phone:p,pass:pa,dur:d,date:new Date().toISOString()}); sv();
+ // 2- إرسال للسيرفر ليصل للمدير في أي هاتف
+ fdb.collection("users").add({
+   name:n, phone:p, password:pa, dur:d, status:"pending", role:"user", createdAt: new Date()
+ }).then(()=>{
+   rm.style.color='green'; rm.innerText='✅ تم إرسال طلبك للإدارة بنجاح - ستصلك الموافقة قريبا';
+ }).catch(e=>{
+   rm.style.color='red'; rm.innerText='تم الحفظ محليا لكن فشل الاتصال: '+e.message+' - افتح قاعدة البيانات Rules';
+ });
+}
+function sLogin(){
+ let p=lp.value.trim(),pa=lpa.value.trim();
+ if((p=='0000'&&pa=='admin123')||(p=='32190319'&&pa=='1234')){
+   pub.classList.add('hidden');admin.classList.remove('hidden');renderPends();return;
+ }
+ let s=db.subs.find(x=>x.phone==p&&x.pass==pa);
+ if(s){
+   if(new Date(s.expiry)<new Date()){lm.innerText='انتهى اشتراكك '+s.expiry.split('T')[0];return}
+   cur=s;pub.classList.add('hidden');sub.classList.remove('hidden');sh.innerText='مرحبا '+s.name;sStart.innerText=new Date(s.start).toLocaleDateString();sEnd.innerText=new Date(s.expiry).toLocaleDateString();let diff=Math.ceil((new Date(s.expiry)-new Date())/(1000*60*60*24));sLeft.innerText=diff+' يوم متبقي';sLeft.style.color=diff<7?'red':'green';ss.innerText=s.start.split('T')[0]+' → '+s.expiry.split('T')[0];setMode(currentMode);return;
+ }
+ // إذا لم يجد محليا، يبحث في السيرفر
+ lm.innerText='⏳ نبحث في السيرفر...';
+ fdb.collection("users").where("phone","==",p).where("password","==",pa).get().then(snap=>{
+   if(snap.empty){lm.innerText='خطأ أو لم تتم الموافقة بعد';return;}
+   let data=snap.docs[0].data();
+   if(data.status==="pending"){lm.innerText='⏳ طلبك معلق بانتظار موافقة الإدارة';return;}
+   if(data.status==="rejected"){lm.innerText='❌ تم رفض حسابك';return;}
+   // تمت الموافقة من الإدارة عبر Firebase، ننشئ له اشتراك محلي
+   let start=new Date(); let expiry=new Date(); expiry.setMonth(expiry.getMonth()+(data.dur||3));
+   let newSub={name:data.name,phone:data.phone,pass:data.password,start:start.toISOString(),expiry:expiry.toISOString(),dur:data.dur||3};
+   if(!db.subs.find(x=>x.phone==p)) db.subs.push(newSub); sv();
+   cur=newSub; pub.classList.add('hidden');sub.classList.remove('hidden');sh.innerText='مرحبا '+newSub.name;
+   sStart.innerText=new Date(newSub.start).toLocaleDateString();sEnd.innerText=new Date(newSub.expiry).toLocaleDateString();let diff=Math.ceil((new Date(newSub.expiry)-new Date())/(1000*60*60*24));sLeft.innerText=diff+' يوم متبقي';setMode(currentMode);
+ });
+}
+function renderPends(){
+ // عرض الطلبات من Firebase مباشرة
+ fdb.collection("users").where("status","==","pending").onSnapshot(snap=>{
+   if(snap.empty &&!db.pends.length){pendList.innerHTML='لا طلبات معلقة حاليا';return;}
+   let html='';
+   // من Firebase
+   snap.forEach(doc=>{
+     let p=doc.data();
+     html+=`<div class="item"><div><b>${p.name}</b> ${p.phone}<br><small>${p.dur||3} شهر - من السيرفر</small></div><div><button class="btn btn-green" style="width:auto" onclick="approveFB('${doc.id}')">قبول</button> <button class="btn btn-red" onclick="rejectFB('${doc.id}')">✕</button></div></div>`;
+   });
+   // من الذاكرة المحلية القديمة أيضا
+   db.pends.forEach((p,i)=>{
+     html+=`<div class="item"><div><b>${p.name}</b> ${p.phone}<br><small>${p.dur} شهر - محلي</small></div><div><button class="btn btn-green" style="width:auto" onclick="approve(${i})">قبول محلي</button> <button class="btn btn-red" onclick="reject(${i})">✕</button></div></div>`;
+   });
+   pendList.innerHTML=html||'لا طلبات';
+ });
+}
 function approve(i){let p=db.pends[i];let start=new Date();let expiry=new Date();expiry.setMonth(expiry.getMonth()+p.dur);db.subs.push({name:p.name,phone:p.phone,pass:p.pass,start:start.toISOString(),expiry:expiry.toISOString(),dur:p.dur});db.pends.splice(i,1);sv();renderPends();alert('تم قبول '+p.name)}
 function reject(i){db.pends.splice(i,1);sv();renderPends();}
+function approveFB(id){fdb.collection("users").doc(id).update({status:"active"}).then(()=>alert('✅ تمت الموافقة - أصبح بإمكان الزبون الدخول الآن'));}
+function rejectFB(id){fdb.collection("users").doc(id).update({status:"rejected"}).then(()=>alert('تم الرفض'));}
 function setMode(m){currentMode=m;localStorage.setItem('hisabi_mode',m);['trader','personal','company','workers','stock','suppliers'].forEach(mm=>{let btn=document.getElementById('mt'+({trader:1,personal:2,company:3,workers:4,stock:5,suppliers:6}[mm])); if(btn) btn.classList.toggle('active',mm==m); let v=document.getElementById(mm+'View'); if(v) v.classList.toggle('hidden',mm!=m); let a=document.getElementById(mm+'Add'); if(a) a.classList.toggle('hidden',mm!=m);}); if(cur) rS();}
 function rS(){
  let f=mf.value;
