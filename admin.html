@@ -1,1 +1,57 @@
-<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ادارة سجل المهني</title><style>body{margin:0;font-family:Tahoma;background:#121212;color:#fff}.header{background:#b71c1c;padding:15px;text-align:center;font-weight:bold;font-size:19px}.card{background:#1e1e1e;margin:12px;border-radius:14px;padding:14px}.stat-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}.stat{background:#2a2a2a;border-radius:10px;padding:12px;text-align:center}.stat b{display:block;font-size:22px;color:#ffca28;margin-bottom:4px}.stat span{font-size:12px;color:#aaa}input{width:93%;padding:13px;border-radius:10px;border:1px solid #555;background:#2a2a2a;color:#fff;font-size:15px;margin:6px 0}.btn{width:100%;padding:13px;border:none;border-radius:10px;font-weight:bold;cursor:pointer;font-size:15px}.red{background:#c62828;color:#fff}.green{background:#2e7d32;color:#fff;width:auto;padding:7px 12px;border-radius:8px}.grey{background:#455a64;color:#fff;width:auto;padding:7px 12px;border-radius:8px}.item{padding:12px 0;border-bottom:1px solid #333;display:flex;justify-content:space-between;align-items:center}.hidden{display:none!important}small{color:#999}</style></head><body><div class="header">إدارة سجل المهني</div><div id="login" class="card" style="margin-top:30px"><h3 style="text-align:center">🔒 دخول الإدارة</h3><input id="pwd" type="number" inputmode="numeric" placeholder="الرمز: 1234"><button class="btn red" onclick="login()">دخول</button><p id="msg" style="text-align:center;color:#ffca28"></p></div><div id="main" class="hidden"><div class="card"><div class="stat-grid"><div class="stat"><b id="totalSubs">0</b><span>عدد المشتركين</span></div><div class="stat"><b id="totalPends">0</b><span>الطلبات الجديدة</span></div><div class="stat"><b id="totalMoney">0</b><span>مجموع الأموال MRU</span></div></div></div><div class="card"><h3>📩 الطلبات الجديدة (<span id="countP">0</span>)</h3><div id="pendList">لا يوجد طلبات</div></div><div class="card"><h3>👥 المشتركين (<span id="countS">0</span>)</h3><input id="search" placeholder="بحث بالاسم أو الهاتف" oninput="render()"><div id="subsList"></div></div><div class="card"><button class="btn" style="background:#333;color:#fff" onclick="logout()">خروج من الإدارة</button></div></div><script>const CODE="1234";function login(){let v=document.getElementById('pwd').value.trim();if(v===CODE){document.getElementById('login').classList.add('hidden');document.getElementById('main').classList.remove('hidden');render();}else{document.getElementById('msg').innerText="الرمز خطأ! جرب 1234";}}function logout(){document.getElementById('main').classList.add('hidden');document.getElementById('login').classList.remove('hidden');document.getElementById('pwd').value="";}function getDB(){return JSON.parse(localStorage.getItem('hisabi_final_v3')||'{"subs":[],"trans":[],"pends":[]}');}function saveDB(db){localStorage.setItem('hisabi_final_v3',JSON.stringify(db))}function render(){let db=getDB();let q=(document.getElementById('search')?.value||'').toLowerCase();document.getElementById('totalSubs').innerText=db.subs.length;document.getElementById('totalPends').innerText=db.pends.length;document.getElementById('countP').innerText=db.pends.length;document.getElementById('countS').innerText=db.subs.length;let money=db.subs.reduce((a,b)=>a+(parseFloat(b.price)||0),0);document.getElementById('totalMoney').innerText=money;let pl=document.getElementById('pendList');if(db.pends.length==0)pl.innerHTML="<small>لا يوجد طلبات جديدة في هذا الهاتف</small>";else{pl.innerHTML="";db.pends.forEach((p,i)=>{pl.innerHTML+=`<div class="item"><div><b>${p.name}</b><br><small>${p.phone} - ${p.dur} أشهر</small></div><div><button class="green" onclick="approve(${i})">موافقة</button> <button class="grey" onclick="reject(${i})">رفض</button></div></div>`;});}let sl=document.getElementById('subsList');let filtered=db.subs.filter(s=>s.name.toLowerCase().includes(q)||s.phone.includes(q));if(filtered.length==0)sl.innerHTML="<small>لا يوجد مشتركين</small>";else{sl.innerHTML="";filtered.forEach(s=>{sl.innerHTML+=`<div class="item"><div><b>${s.name}</b> - ${s.phone}<br><small>ينتهي: ${new Date(s.expiry).toLocaleDateString()} | السعر: ${s.price} | كلمة السر: ${s.pass}</small></div><div><button class="grey" onclick="delSub('${s.phone}')">حذف</button></div></div>`;});}}function approve(i){let db=getDB();let p=db.pends[i];let ex=new Date();ex.setMonth(ex.getMonth()+p.dur);let price=prompt("سعر الاشتراك لـ "+p.name+" ؟","0");db.subs.push({name:p.name,phone:p.phone,pass:p.pass,dur:p.dur,price:parseFloat(price||0),start:new Date().toISOString(),expiry:ex.toISOString()});db.pends.splice(i,1);saveDB(db);render();alert("تمت الموافقة");}function reject(i){if(!confirm("رفض الطلب؟"))return;let db=getDB();db.pends.splice(i,1);saveDB(db);render();}function delSub(phone){if(!confirm("حذف المشترك نهائيا؟"))return;let db=getDB();db.subs=db.subs.filter(s=>s.phone!=phone);saveDB(db);render();}document.getElementById('pwd').addEventListener('keyup',e=>{if(e.key==='Enter')login();});</script></body></html>
+<!DOCTYPE html>
+<html dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>حسابي - دخول</title>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+<script>
+// استبدل هذا بالإعدادات من Firebase Console > Project Settings
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "hisabiapp-c3a50.firebaseapp.com",
+  projectId: "hisabiapp-c3a50"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+function register(){
+  let phone = document.getElementById('phone').value;
+  let name = document.getElementById('name').value;
+  let pass = document.getElementById('pass').value;
+
+  // هذا السطر هو الحل - يحفظ في السحابة ويصل للإدارة فورا
+  db.collection("users").add({
+    phone: phone,
+    name: name,
+    password: pass,
+    status: "pending",
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  }).then(()=>{
+    alert("تم إرسال طلبك للإدارة، انتظر الموافقة ⏳");
+  });
+}
+
+function login(){
+  let phone = document.getElementById('phone').value;
+  let pass = document.getElementById('pass').value;
+  db.collection("users").where("phone","==",phone).where("password","==",pass).get().then(snap=>{
+    if(snap.empty){ alert("بيانات خاطئة"); return; }
+    let u = snap.docs[0].data();
+    if(u.status=="pending"){
+      alert("حسابك قيد المراجعة من الإدارة");
+    } else if(u.status=="active"){
+      localStorage.setItem("user", phone);
+      location.href="dashboard.html";
+    } else {
+      alert("تم رفض حسابك");
+    }
+  });
+}
+document.addEventListener('keyup',e=>{if(e.key==='Enter')login();});
+</script>
+</body>
+</html>
