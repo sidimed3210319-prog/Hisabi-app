@@ -113,7 +113,7 @@ let db=JSON.parse(localStorage.getItem('hisabi_final_v3')||'{"trans":[],"workers
 function sv(){localStorage.setItem('hisabi_final_v3',JSON.stringify(db))}
 let cur=null;let currentMode=localStorage.getItem('hisabi_mode')||'trader';let curCurrency=localStorage.getItem('hisabi_cur')||'أوقية';
 ['od','odPIncome','odPExpense','cDate','payDate','supDate','repDate','debtDate'].forEach(id=>{let el=document.getElementById(id); if(el) el.valueAsDate=new Date();});
-const PRICES={3:30000,6:60000,12:100000};
+const PRICES={3:15000,6:30000,12:50000};
 function getCur(){return curCurrency||'أوقية';}
 function changeCurrency(){curCurrency=document.getElementById('curSelect').value; if(cur) localStorage.setItem('hisabi_cur_'+cur.phone,curCurrency); localStorage.setItem('hisabi_cur',curCurrency); rS();}
 function getFullPhone(ccId,phId){let cc=document.getElementById(ccId).value; let ph=document.getElementById(phId).value.trim().replace(/[^0-9]/g,''); if(!ph) return ''; if(ph.startsWith('0')) ph=ph.substring(1); return cc+ph;}
