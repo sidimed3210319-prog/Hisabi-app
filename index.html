@@ -35,12 +35,19 @@ input,select{width:100%;padding:11px;margin:5px 0;border:1px solid #ccc;border-r
 <div class="phone-row">
 <select id="lcc"><option value="+222" selected>🇲🇷 +222 موريتانيا</option><option value="+212">🇲🇦 +212 المغرب</option><option value="+221">🇸🇳 +221 السنغال</option><option value="+223">🇲🇱 +223 مالي</option><option value="+213">🇩🇿 +213 الجزائر</option><option value="+216">🇹🇳 +216 تونس</option><option value="+218">🇱🇾 +218 ليبيا</option><option value="+20">🇪🇬 +20 مصر</option><option value="+1">🇺🇸 +1 أمريكا</option><option value="+244">🇦🇴 +244 أنغولا</option><option value="+974">🇶🇦 +974 قطر</option><option value="+90">🇹🇷 +90 تركيا</option><option value="+220">🇬🇲 +220 غامبيا</option><option value="+224">🇬🇳 +224 غينيا</option><option value="+225">🇨🇮 +225 ساحل العاج</option><option value="+233">🇬🇭 +233 غانا</option><option value="+234">🇳🇬 +234 نيجيريا</option><option value="+33">🇫🇷 +33 فرنسا</option><option value="+34">🇪🇸 +34 إسبانيا</option><option value="+44">🇬🇧 +44 بريطانيا</option><option value="+49">🇩🇪 +49 ألمانيا</option><option value="+966">🇸🇦 +966 السعودية</option><option value="+971">🇦🇪 +971 الإمارات</option><option value="+965">🇰🇼 +965 الكويت</option><option value="+973">🇧🇭 +973 البحرين</option><option value="+968">🇴🇲 +968 عمان</option><option value="+86">🇨🇳 +86 الصين</option><option value="+91">🇮🇳 +91 الهند</option></select><input id="lp" placeholder="رقم الهاتف بدون المفتاح">
 </div>
-<input id="lpa" type="password" placeholder="كلمة السر"><button class="btn btn-blue" onclick="sLogin()">دخول</button><button class="btn" style="margin-top:8px;background:#fff;color:#0d47a1;border:2px dashed #0d47a1" onclick="forgotPass()">🔑 نسيت كلمة السر؟</button><div id="lm" class="small" style="color:red;text-align:center;margin-top:8px;font-weight:bold"></div></div>
+<input id="lpa" type="password" placeholder="كلمة السر"><button class="btn btn-blue" onclick="sLogin()">دخول</button><button class="btn" style="margin-top:8px;background:#fff;color:#0d47a1;border:2px dashed #0d47a1" onclick="forgotPass()">🔑 نسيت كلمة السر؟</button>
+<div class="small" style="text-align:center;margin-top:10px;background:#e3f2fd;padding:8px;border-radius:10px">📞 الإدارة: <b>49384159</b> - <a href="https://wa.me/22249384159" target="_blank" style="color:#2e7d32;font-weight:bold">💬 واتساب</a></div>
+<div id="lm" class="small" style="color:red;text-align:center;margin-top:8px;font-weight:bold"></div></div>
 <div id="rb" class="hidden"><h3 style="text-align:center">طلب اشتراك جديد</h3><input id="rn" placeholder="اسمك / المحل">
 <div class="phone-row">
 <select id="rcc"><option value="+222" selected>🇲🇷 +222 موريتانيا</option><option value="+212">🇲🇦 +212 المغرب</option><option value="+221">🇸🇳 +221 السنغال</option><option value="+223">🇲🇱 +223 مالي</option><option value="+213">🇩🇿 +213 الجزائر</option><option value="+216">🇹🇳 +216 تونس</option><option value="+218">🇱🇾 +218 ليبيا</option><option value="+20">🇪🇬 +20 مصر</option><option value="+1">🇺🇸 +1 أمريكا</option><option value="+244">🇦🇴 +244 أنغولا</option><option value="+974">🇶🇦 +974 قطر</option><option value="+90">🇹🇷 +90 تركيا</option><option value="+220">🇬🇲 +220 غامبيا</option><option value="+224">🇬🇳 +224 غينيا</option><option value="+225">🇨🇮 +225 ساحل العاج</option><option value="+233">🇬🇭 +233 غانا</option><option value="+234">🇳🇬 +234 نيجيريا</option><option value="+33">🇫🇷 +33 فرنسا</option><option value="+34">🇪🇸 +34 إسبانيا</option><option value="+44">🇬🇧 +44 بريطانيا</option><option value="+49">🇩🇪 +49 ألمانيا</option><option value="+966">🇸🇦 +966 السعودية</option><option value="+971">🇦🇪 +971 الإمارات</option><option value="+965">🇰🇼 +965 الكويت</option><option value="+973">🇧🇭 +973 البحرين</option><option value="+968">🇴🇲 +968 عمان</option><option value="+86">🇨🇳 +86 الصين</option><option value="+91">🇮🇳 +91 الهند</option></select><input id="rp" placeholder="هاتفك بدون المفتاح">
 </div>
-<input id="rpa" type="password" placeholder="كلمة سر جديدة"><select id="rd" onchange="updatePrice()"><option value="3" selected>3 أشهر - 10,000 أوقية</option><option value="6">6 أشهر - 20,000 أوقية</option><option value="12">سنة كاملة - 40,000 أوقية</option></select><div id="pricePreview" class="priceBox">💰 السعر: 10,000 أوقية</div><button class="btn btn-green" onclick="sReq()">إرسال طلب</button><div id="rm" class="small" style="text-align:center;margin-top:8px"></div></div></div></div>
+<input id="rpa" type="password" placeholder="كلمة سر جديدة">
+<select id="rd"><option value="3" selected>3 أشهر</option><option value="6">6 أشهر</option><option value="12">سنة كاملة</option></select>
+<div id="pricePreview" class="priceBox hidden">💰 السعر: 10,000 أوقية</div>
+<button class="btn btn-green" onclick="sReq()">إرسال طلب</button>
+<div class="small" style="text-align:center;margin-top:10px;background:#e3f2fd;padding:8px;border-radius:10px">📞 الإدارة: <b>49384159</b> - <a href="https://wa.me/22249384159" target="_blank" style="color:#2e7d32;font-weight:bold">💬 واتساب</a></div>
+<div id="rm" class="small" style="text-align:center;margin-top:8px"></div></div></div></div>
 <div id="admin" class="hidden"><div class="card"><h3>🛠️ لوحة الإدارة السرية</h3>
 <div id="adminLock"><p class="small">أدخل كلمة سر الإدارة</p><input id="ap" type="password" placeholder="كلمة السر"><button class="btn btn-blue" style="background:#000" onclick="adminLogin()">دخول</button><div class="small" style="text-align:center;margin-top:6px">الافتراضية: 1234 قابلة للتغيير</div><div id="am" class="small" style="color:red;text-align:center;margin-top:5px"></div></div>
 <div id="adminContent" class="hidden">
@@ -55,7 +62,7 @@ input,select{width:100%;padding:11px;margin:5px 0;border:1px solid #ccc;border-r
 <div id="sub" class="hidden"><div class="card"><div style="display:flex;justify-content:space-between;gap:6px;align-items:center"><h3 id="sh" style="margin:0"></h3>
 <div style="display:flex;gap:4px"><select id="curSelect" onchange="changeCurrency()" style="width:115px;padding:6px"><option value="أوقية">أوقية MRU</option><option value="درهم">درهم MAD</option><option value="فرنك">فرنك XOF</option><option value="دولار">دولار USD</option><option value="يورو">يورو EUR</option><option value="دينار">دينار LYD</option><option value="جنيه">جنيه EGP</option></select><button class="btn btn-grey" style="width:auto;padding:6px" onclick="changePass()">🔑</button></div>
 </div>
-<div class="subInfo"><div>📅 اشترك: <span id="sStart">-</span> | ⏰ ينتهي: <span id="sEnd">-</span> | ⌛ <span id="sLeft"></span></div><div class="small" id="ss"></div><div id="subPriceInfo" class="priceBox hidden"></div></div>
+<div class="subInfo"><div>📅 اشترك: <span id="sStart">-</span> | ⏰ ينتهي: <span id="sEnd">-</span> | ⌛ <span id="sLeft"></span></div><div class="small" id="ss"></div><div id="subPriceInfo" class="priceBox hidden" style="background:#e3f2fd;border-color:#0d47a1;color:#0d47a1"></div></div>
 <div class="mode-tabs">
 <div class="mode-tab active" id="mt1" onclick="setMode('trader')">🧑‍💼 تاجر</div>
 <div class="mode-tab" id="mt2" onclick="setMode('personal')">👤 شخصي</div>
@@ -111,13 +118,54 @@ function sv(){localStorage.setItem('hisabi_final_v3',JSON.stringify(db))}
 let cur=null;let currentMode=localStorage.getItem('hisabi_mode')||'trader';let curCurrency=localStorage.getItem('hisabi_cur')||'أوقية';
 ['od','odPIncome','odPExpense','cDate','payDate','supDate','repDate','debtDate'].forEach(id=>{let el=document.getElementById(id); if(el) el.valueAsDate=new Date();});
 const PRICES={3:10000,6:20000,12:40000};
+const ADMIN_PHONE="49384159";
 function getCur(){return curCurrency||'أوقية';}
 function changeCurrency(){curCurrency=document.getElementById('curSelect').value; if(cur) localStorage.setItem('hisabi_cur_'+cur.phone,curCurrency); localStorage.setItem('hisabi_cur',curCurrency); rS();}
 function getFullPhone(ccId,phId){let cc=document.getElementById(ccId).value; let ph=document.getElementById(phId).value.trim().replace(/[^0-9]/g,''); if(!ph) return ''; if(ph.startsWith('0')) ph=ph.substring(1); return cc+ph;}
-function updatePrice(){let d=parseInt(rd.value);let price=PRICES[d]||10000; document.getElementById('pricePreview').innerText='💰 السعر: '+price.toLocaleString()+' أوقية';}updatePrice();
 function st(t){lb.classList.toggle('hidden',t!='login');rb.classList.toggle('hidden',t!='reg');t1.classList.toggle('active',t=='login');t2.classList.toggle('active',t=='reg')}
-async function sReq(){let n=rn.value.trim(),pa=rpa.value.trim(),d=parseInt(rd.value); let fullPhone=getFullPhone('rcc','rp'); if(!n||!fullPhone||!pa){rm.innerText='أكمل جميع الحقول';return}let price=PRICES[d]||10000; rm.innerText='جاري...';try{let ex=await fsdb.collection("users").where("phone","==",fullPhone).get();if(!ex.empty){rm.innerText='مسجل مسبقا: '+fullPhone;return}let now=new Date(),exp=new Date();exp.setMonth(exp.getMonth()+d);await fsdb.collection("users").add({name:n,phone:fullPhone,pass:pa,password:pa,start:now.toISOString(),expiry:exp.toISOString(),status:'pending',days:d,dur:d,price:price,amount:price,totalPaid:price,countryCode:document.getElementById('rcc').value});rm.style.color='green';rm.innerText='✅ تم - '+fullPhone+' - '+price.toLocaleString()+' أوقية';}catch(e){rm.innerText=e.message}}
-async function sLogin(){let pa=lpa.value.trim(); let fullPhone=getFullPhone('lcc','lp'); let rawPhone=document.getElementById('lp').value.trim(); if(!fullPhone||!pa){lm.innerText='أكمل الرقم وكلمة السر';return}lm.innerText='جاري...';try{let snap=await fsdb.collection("users").where("phone","==",fullPhone).get(); if(snap.empty && rawPhone){ snap=await fsdb.collection("users").where("phone","==",rawPhone).get(); } if(snap.empty){lm.innerText='رقم غير موجود: '+fullPhone;return}let s=snap.docs[0].data();if(s.status==='pending'){lm.innerText='طلبك قيد المراجعة';return}if(s.status==='blocked'){lm.innerText='🚫 تم حظرك - تواصل مع الإدارة';return}if((s.pass||s.password)!=pa){lm.innerText='كلمة السر خطأ';return}if(new Date(s.expiry)<new Date()){lm.innerText='انتهى اشتراكك - تواصل للتجديد';return}cur={name:s.name,phone:s.phone,pass:s.pass||s.password,start:s.start,expiry:s.expiry,id:snap.docs[0].id,price:s.price||0}; let savedCur=localStorage.getItem('hisabi_cur_'+s.phone)||localStorage.getItem('hisabi_cur')||'أوقية'; curCurrency=savedCur; document.getElementById('curSelect').value=savedCur; pub.classList.add('hidden');sub.classList.remove('hidden');sh.innerText='مرحبا '+s.name+' ('+s.phone+')';sStart.innerText=new Date(s.start).toLocaleDateString();sEnd.innerText=new Date(s.expiry).toLocaleDateString();let diff=Math.ceil((new Date(s.expiry)-new Date())/86400000);sLeft.innerText=diff+' يوم متبقي';ss.innerText=s.start.split('T')[0]+' → '+s.expiry.split('T')[0]; if(s.price){let pi=document.getElementById('subPriceInfo'); pi.classList.remove('hidden'); pi.innerText='💰 اشتراكك: '+(s.price||s.amount).toLocaleString()+' أوقية - '+s.dur+' شهر';} setMode(currentMode);lm.innerText='';}catch(e){lm.innerText=e.message}}
+
+async function sReq(){
+  let n=rn.value.trim(),pa=rpa.value.trim(),d=parseInt(rd.value); 
+  let fullPhone=getFullPhone('rcc','rp'); 
+  if(!n||!fullPhone||!pa){rm.innerText='أكمل جميع الحقول';return}
+  let price=PRICES[d]||10000; 
+  rm.innerText='جاري...';
+  try{
+    let ex=await fsdb.collection("users").where("phone","==",fullPhone).get();
+    if(!ex.empty){
+      let statusNow = ex.docs[0].data().status;
+      if(statusNow=='pending'){
+        rm.style.color='orange';
+        rm.style.fontWeight='bold';
+        rm.innerHTML='⏳ يرجى انتظار موافقة الإدارة<br>📞 تواصل: <a href="tel:+222'+ADMIN_PHONE+'" style="color:#0d47a1">'+ADMIN_PHONE+'</a> - <a href="https://wa.me/222'+ADMIN_PHONE+'" target="_blank" style="color:#fff;background:#2e7d32;padding:3px 8px;border-radius:12px;text-decoration:none">واتساب</a>';
+        return;
+      }
+      if(statusNow=='active'){
+        rm.style.color='green';
+        rm.style.fontWeight='bold';
+        rm.innerText='✅ أنت مشترك بالفعل - يمكنك الدخول';
+        return;
+      }
+      if(statusNow=='blocked'){
+        rm.style.color='red';
+        rm.style.fontWeight='bold';
+        rm.innerHTML='🚫 تم حظرك - تواصل مع الإدارة: '+ADMIN_PHONE+' <a href="https://wa.me/222'+ADMIN_PHONE+'">واتساب</a>';
+        return;
+      }
+    }
+    let now=new Date(),exp=new Date();
+    exp.setMonth(exp.getMonth()+d);
+    await fsdb.collection("users").add({name:n,phone:fullPhone,pass:pa,password:pa,start:now.toISOString(),expiry:exp.toISOString(),status:'pending',days:d,dur:d,price:price,amount:price,totalPaid:price,countryCode:document.getElementById('rcc').value});
+    rm.style.color='green';
+    rm.style.fontWeight='bold';
+    rm.innerHTML='✅ تم إرسال طلبك بنجاح<br>⏳ يرجى انتظار موافقة الإدارة<br>📞 رقم الإدارة: <b>'+ADMIN_PHONE+'</b> - <a href="https://wa.me/222'+ADMIN_PHONE+'" target="_blank" style="background:#2e7d32;color:#fff;padding:4px 10px;border-radius:20px;text-decoration:none">💬 واتساب</a>';
+  }catch(e){rm.style.color='red'; rm.innerText=e.message}
+}
+
+async function sLogin(){let pa=lpa.value.trim(); let fullPhone=getFullPhone('lcc','lp'); let rawPhone=document.getElementById('lp').value.trim(); if(!fullPhone||!pa){lm.innerText='أكمل الرقم وكلمة السر';return}lm.innerText='جاري...';try{let snap=await fsdb.collection("users").where("phone","==",fullPhone).get(); if(snap.empty && rawPhone){ snap=await fsdb.collection("users").where("phone","==",rawPhone).get(); } if(snap.empty){lm.innerText='رقم غير موجود: '+fullPhone;return}let s=snap.docs[0].data();if(s.status==='pending'){lm.style.color='orange'; lm.innerHTML='⏳ يرجى انتظار موافقة الإدارة<br>📞 '+ADMIN_PHONE+' <a href="https://wa.me/222'+ADMIN_PHONE+'" target="_blank">واتساب</a>';return}if(s.status==='blocked'){lm.innerText='🚫 تم حظرك - تواصل مع الإدارة: '+ADMIN_PHONE;return}if((s.pass||s.password)!=pa){lm.innerText='كلمة السر خطأ';return}if(new Date(s.expiry)<new Date()){lm.innerHTML='⏰ انتهى اشتراكك - للتجديد تواصل: '+ADMIN_PHONE+' <a href="https://wa.me/222'+ADMIN_PHONE+'" target="_blank">واتساب</a>';return}cur={name:s.name,phone:s.phone,pass:s.pass||s.password,start:s.start,expiry:s.expiry,id:snap.docs[0].id,price:s.price||0,dur:s.dur||s.days||3}; let savedCur=localStorage.getItem('hisabi_cur_'+s.phone)||localStorage.getItem('hisabi_cur')||'أوقية'; curCurrency=savedCur; document.getElementById('curSelect').value=savedCur; pub.classList.add('hidden');sub.classList.remove('hidden');sh.innerText='مرحبا '+s.name+' ('+s.phone+')';sStart.innerText=new Date(s.start).toLocaleDateString();sEnd.innerText=new Date(s.expiry).toLocaleDateString();let diff=Math.ceil((new Date(s.expiry)-new Date())/86400000);sLeft.innerText=diff+' يوم متبقي';ss.innerText=s.start.split('T')[0]+' → '+s.expiry.split('T')[0];
+let pi=document.getElementById('subPriceInfo'); if(pi){ pi.classList.remove('hidden'); pi.innerText='📅 مدة اشتراكك: '+cur.dur+' شهر'; }
+setMode(currentMode);lm.innerText='';}catch(e){lm.innerText=e.message}}
+
 async function forgotPass(){let fullPhone=getFullPhone('lcc','lp'); if(!fullPhone) fullPhone=prompt("اكتب رقمك الكامل مع المفتاح مثلا +222...:")||''; if(!fullPhone) return; try{let snap=await fsdb.collection("users").where("phone","==",fullPhone).get(); if(snap.empty){alert('رقم غير موجود: '+fullPhone);return}let d=snap.docs[0].data();alert('رقمك: '+fullPhone+'\nكلمة سرك: '+(d.pass||d.password));}catch(e){alert(e.message)}}
 async function changePass(){let np=prompt("كلمة السر الجديدة:");if(!np)return;try{await fsdb.collection("users").doc(cur.id).update({pass:np,password:np});alert('تم: '+np);cur.pass=np;}catch(e){alert(e.message)}}
 function getAdminPass(){return localStorage.getItem('hisabi_admin_pass')||'1234';}
